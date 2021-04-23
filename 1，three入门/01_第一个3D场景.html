@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第一个three.js文件_WebGL三维场景</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            /* 隐藏body窗口区域滚动条 */
+        }
+    </style>
+    <script src="../JS/three.js"></script>
+</head>
+
+<body>
+    <script>
+        /*
+        * 创建场景对象
+        */
+        var scene = new THREE.Scene();
+        /*
+        * 创建网格模型
+        */
+        // 创建立方体几何对象
+        var geometry = new THREE.BoxGeometry(100, 100, 100);
+        // 创建材质对象
+        var material = new THREE.MeshLambertMaterial({
+            color: 0x0000ff
+        });
+        // 网格模型对象绑定
+        var mesh = new THREE.Mesh(geometry, material);
+        // 将网格模型添加到场景中
+        scene.add(mesh);
+
+        /*
+        * 光源设置
+        */
+        // 点光源对象
+        var point = new THREE.PointLight(0xffffff);
+        // 光源位置
+        point.position.set(100, 200, 300);
+        // 将光源对象添加到场景
+        scene.add(point);
+        // 环境光对象
+        var ambient = new THREE.AmbientLight(0x444444);
+        scene.add(ambient);
+
+        /*
+        * 相机设置
+        */
+        // 窗口宽度
+        var width = window.innerWidth;
+        // 窗口高度
+        var height = window.innerHeight;
+        // 窗口宽高比
+        var k = width / height;
+        // 三维场景显示范围控制系数，系数越大，现实的范围越大
+        var s = 500;
+        // 创建相机对象
+        var camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);
+        // 相机位置设置
+        camera.position.set(500, 500, 500);
+        // 设置相机方向
+        camera.lookAt(scene.position);
+        // camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+        /*
+        * 创建渲染对象
+        */
+        var renderer = new THREE.WebGLRenderer();
+        // 设置渲染区域尺寸
+        renderer.setSize(width, height);
+        // 设置背景色
+        renderer.setClearColor(0xb9d3ff, 1);
+        // DOM元素中插入canvas对象
+        document.body.appendChild(renderer.domElement);
+        // 执行渲染操作  指定场景，相机作为参数
+        renderer.render(scene, camera);
+    </script>
+</body>
+
+</html>

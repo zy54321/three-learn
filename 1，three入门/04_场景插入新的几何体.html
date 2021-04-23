@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鼠标操作三维场景旋转缩放</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            /* 隐藏body窗口区域滚动条 */
+        }
+    </style>
+    <script src="../JS/three.js"></script>
+    <script src="../JS/three.js-master/examples/js/controls/OrbitControls.js"></script>
+</head>
+
+<body>
+    <script>
+        /*
+        * 创建场景对象
+        */
+        var scene = new THREE.Scene();
+
+        /*
+        * 创建网格模型
+        */
+        var material1 = new THREE.MeshLambertMaterial({
+            color: 0xa61b29
+        });
+        var material2 = new THREE.MeshLambertMaterial({
+            color: 0x0093D3
+        });
+        var material3 = new THREE.MeshLambertMaterial({
+            color: 0xFFF10C
+        });
+        // 长方体 参数：长，宽，高
+        var geometry1 = new THREE.BoxGeometry(100, 100, 100);
+        var mesh1 = new THREE.Mesh(geometry1, material1);
+        mesh1.position.set(0, 0, -120);
+        scene.add(mesh1);
+
+        // 球体 参数：半径60  经纬度细分数40,40
+        var geometry2 = new THREE.SphereGeometry(60, 40, 40);
+        var mesh2 = new THREE.Mesh(geometry2, material3);
+        //球体网格模型沿Y轴正方向平移120
+        mesh2.translateY(120);
+        scene.add(mesh2);
+
+        // 圆柱  参数：圆柱面顶部、底部直径50,50   高度100  圆周分段数
+        var geometry3 = new THREE.CylinderGeometry(50, 50, 100, 25);
+        var mesh3 = new THREE.Mesh(geometry3, material2);
+        //球体网格模型沿Y轴正方向平移120
+        mesh3.translateX(-120);
+        scene.add(mesh3);
+
+        // 正八面体 参数：半径大小
+        var geometry4 = new THREE.OctahedronGeometry(50);
+        var mesh4 = new THREE.Mesh(geometry4, material2);
+        //球体网格模型沿Y轴正方向平移120
+        // mesh4.translateX(-120);
+        //设置mesh3模型对象的xyz坐标为120,0,0
+        mesh4.position.set(120, 0, 0);
+        scene.add(mesh4);
+
+        // 正十二面体 参数：半径大小
+        var geometry5 = new THREE.DodecahedronGeometry(50);
+        var mesh5 = new THREE.Mesh(geometry5, material3);
+        //球体网格模型沿Y轴正方向平移120
+        // mesh4.translateX(-120);
+        //设置mesh3模型对象的xyz坐标为120,0,0
+        mesh5.position.set(0, -120, 0);
+        scene.add(mesh5);
+
+        // 正二十面体 参数：半径大小
+        var geometry6 = new THREE.IcosahedronGeometry(50);
+        var mesh6 = new THREE.Mesh(geometry6, material1);
+        //球体网格模型沿Y轴正方向平移120
+        // mesh4.translateX(-120);
+        //设置mesh3模型对象的xyz坐标为120,0,0
+        mesh6.position.set(0, 0, 120);
+        scene.add(mesh6);
+
+        // 辅助坐标系
+        var axisHelper = new THREE.AxisHelper(250);
+        scene.add(axisHelper);
+
+        /*
+        * 光源设置
+        */
+        var point = new THREE.PointLight(0xffffff);
+        point.position.set(400, 200, 300);
+        scene.add(point);
+        var ambient = new THREE.AmbientLight(0xe384b8);
+        scene.add(ambient);
+
+        /*
+        * 相机设置
+        */
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        var k = width / height;
+        var s = 400;
+        var camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);
+        camera.position.set(200, 300, 200);
+        camera.lookAt(scene.position);
+
+        /*
+        * 创建渲染器
+        */
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(width, height);
+        renderer.setClearColor(0xf0a1a8, 1);
+        document.body.appendChild(renderer.domElement);
+
+        // 渲染函数执行
+        function render() {
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        }
+        render();
+        var controls = new THREE.OrbitControls(camera);
+    </script>
+</body>
+
+</html>
