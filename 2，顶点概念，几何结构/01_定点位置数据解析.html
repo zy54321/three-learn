@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鼠标操作三维场景旋转缩放</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            /* 隐藏body窗口区域滚动条 */
+        }
+    </style>
+    <script src="../JS/three.js"></script>
+    <script src="../JS/three.js-master/examples/js/controls/OrbitControls.js"></script>
+</head>
+
+<body>
+    <script>
+        /*
+        * 创建场景对象
+        */
+        var scene = new THREE.Scene();
+
+        /*
+        * 创建网格模型
+        */
+        //创建一个Buffer类型几何体对象
+        var geometry1 = new THREE.BufferGeometry();
+        //类型数组创建顶点数据
+        var vertices = new Float32Array([
+            0, 0, 0, //顶点1坐标
+            50, 0, 0, //顶点2坐标
+            0, 100, 0, //顶点3坐标
+            0, 0, 10, //顶点4坐标
+            0, 0, 100, //顶点5坐标
+            50, 0, 10, //顶点6坐标
+        ]);
+        // 创建属性缓冲区对象
+        // 3个为一组
+        var attribue = new THREE.BufferAttribute(vertices, 3);
+        // 设置Buffer类型几何体对象attributes属性的位置属性
+        geometry1.attributes.position = attribue;
+
+        // 三角面（网格）渲染模式
+        var material1 = new THREE.MeshBasicMaterial({
+            color: 0x0093D3, // 三角面颜色
+            side: THREE.DoubleSide //两面可见
+        })
+        var mesh = new THREE.Mesh(geometry1, material1);
+        scene.add(mesh);
+
+        var geometry2 = new THREE.BufferGeometry();
+        var vertices = new Float32Array([
+            50, 10, 60, //顶点1坐标
+            50, 20, 50, //顶点2坐标
+            50, 30, 40, //顶点3坐标
+            50, 40, 30, //顶点4坐标
+            50, 50, 20, //顶点5坐标
+            50, 60, 10, //顶点6坐标
+        ]);
+        var attribue = new THREE.BufferAttribute(vertices, 3);
+        geometry2.attributes.position = attribue;
+        // 点渲染模式
+        var material2 = new THREE.PointsMaterial({
+            color: 0xFFF10C,
+            size: 15.0 //点对象像素尺寸
+        }); //材质对象
+        var points = new THREE.Points(geometry2, material2); //点模型对象
+        scene.add(points); //点对象添加到场景中
+
+        var geometry3 = new THREE.BufferGeometry();
+        var vertices = new Float32Array([
+            50, 110, 50, //顶点1坐标
+            0, 110, 0, //顶点2坐标
+            -50, 100, 0, //顶点3坐标
+        ]);
+        var attribue = new THREE.BufferAttribute(vertices, 3);
+        geometry3.attributes.position = attribue;
+        // 线条渲染模式
+        var material3 = new THREE.LineBasicMaterial({
+            color: 0xa61b29 //线条颜色
+        });//材质对象
+        var line = new THREE.Line(geometry3, material3);//线条模型对象
+        scene.add(line);//线条对象添加到场景中
+
+        // 辅助坐标系  
+        var axisHelper = new THREE.AxisHelper(250);
+        scene.add(axisHelper);
+
+        /*
+        * 光源设置
+        */
+        // var point = new THREE.PointLight(0xffffff);
+        // point.position.set(200, 200, 200);
+        // scene.add(point);
+        // var ambient = new THREE.AmbientLight(0xe384b8);
+        // scene.add(ambient);
+
+        /*
+        * 相机设置
+        */
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        var k = width / height;
+        var s = 400;
+        var camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);
+        camera.position.set(200, 300, 200);
+        camera.lookAt(scene.position);
+
+        /*
+        * 创建渲染器
+        */
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(width, height);
+        renderer.setClearColor(0xf0a1a8, 1);
+        document.body.appendChild(renderer.domElement);
+
+        // 渲染函数执行
+        function render() {
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        }
+        render();
+        var controls = new THREE.OrbitControls(camera);
+    </script>
+</body>
+
+</html>

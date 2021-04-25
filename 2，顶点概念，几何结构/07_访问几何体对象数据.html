@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鼠标操作三维场景旋转缩放</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            /* 隐藏body窗口区域滚动条 */
+        }
+    </style>
+    <script src="../JS/three.js"></script>
+    <script src="../JS/three.js-master/examples/js/controls/OrbitControls.js"></script>
+</head>
+
+<body>
+    <script>
+        /*
+        * 创建场景对象
+        */
+        var scene = new THREE.Scene();
+
+        /*
+        * 创建网格模型
+        */
+        // 创建立方体几何体对象
+        var geometry = new THREE.BoxGeometry(100, 100, 100);
+        console.log(geometry);
+        console.log('几何体顶点位置数据', geometry.vertices);
+        console.log('三角面数据', geometry.faces);
+
+        // 设置立方体顶点颜色
+        geometry.faces.forEach(face => {
+            // 设置三角面face三个顶点的颜色
+            face.vertexColors = [
+                new THREE.Color(0xa61b29),
+                new THREE.Color(0x0093D3),
+                new THREE.Color(0xFFF10C),
+            ]
+        });
+
+        // 删除立方体一个三角面
+        geometry.faces.pop();
+
+        // 材质对象
+        var material = new THREE.MeshLambertMaterial({
+            // color: 0x000088,
+            vertexColors: THREE.FaceColors,
+            // wireframe:true,//线框模式渲染
+            side: THREE.DoubleSide
+        });
+        var mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh)
+
+        // 辅助坐标系  
+        var axisHelper = new THREE.AxisHelper(250);
+        scene.add(axisHelper);
+
+        /*
+        * 光源设置
+        */
+        var point = new THREE.PointLight(0xffffff);
+        point.position.set(400, 200, 300);
+        scene.add(point);
+        var ambient = new THREE.AmbientLight(0xe384b8);
+        scene.add(ambient);
+
+        /*
+        * 相机设置
+        */
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        var k = width / height;
+        var s = 300;
+        var camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);
+        camera.position.set(200, 300, 200);
+        camera.lookAt(scene.position);
+
+        /*
+        * 创建渲染器
+        */
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(width, height);
+        renderer.setClearColor(0xf0a1a8, 1);
+        document.body.appendChild(renderer.domElement);
+
+        // 渲染函数执行
+        function render() {
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        }
+        render();
+        var controls = new THREE.OrbitControls(camera);
+    </script>
+</body>
+
+</html>
