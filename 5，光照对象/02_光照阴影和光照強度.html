@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>光照阴影</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            /* 隐藏body窗口区域滚动条 */
+        }
+    </style>
+    <script src="../JS/three.js"></script>
+    <script src="../JS/three.js-master/examples/js/controls/OrbitControls.js"></script>
+</head>
+
+<body>
+    <script>
+        /*
+        * 创建场景对象
+        */
+        var scene = new THREE.Scene();
+
+        /*
+        * 创建网格模型
+        */
+        // 声明立方体几何对象
+        var geometry1 = new THREE.BoxGeometry(40, 100, 40);
+        // 点渲染模式
+        var material1 = new THREE.MeshLambertMaterial({
+            color: 0xFFF10C, //颜色
+        });
+        var mesh1 = new THREE.Mesh(geometry1, material1);
+        mesh1.translateX(-150);
+        scene.add(mesh1);
+        // 设置产生阴影的网格模型
+        mesh1.castShadow = true;
+
+        var geometry2 = new THREE.BoxGeometry(80, 100, 80);
+        // 点渲染模式
+        var material2 = new THREE.MeshLambertMaterial({
+            color: 0x0093D3, //颜色
+        });
+        var mesh2 = new THREE.Mesh(geometry2, material2);
+        mesh2.translateX(150);
+        mesh2.translateZ(-50);
+        scene.add(mesh2);
+        // 设置产生阴影的网格模型
+        mesh2.castShadow = true;
+
+        // 创建一个平面几何体作为投影面
+        var planeGeometry = new THREE.PlaneGeometry(500, 300);
+        var planeMaterial = new THREE.MeshLambertMaterial({
+            color: 0x999999,
+            // side: THREE.DoubleSide
+        });
+        // 平面网格模型作为投影面
+        var planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+        scene.add(planeMesh);
+        //旋转网格模型
+        planeMesh.rotateX(-Math.PI / 2);
+        //设置网格模型y坐标
+        planeMesh.position.y = -51;
+        // 设置接受阴影的投影面
+        planeMesh.receiveShadow = true;
+
+        // 辅助坐标系  
+        var axisHelper = new THREE.AxisHelper(250);
+        scene.add(axisHelper);
+
+        /*
+        * 光源设置
+        */
+        //环境光   环境光颜色RGB成分分别和物体材质颜色RGB成分分别相乘
+        var ambient = new THREE.AmbientLight(0x444444);
+        // 设置光照强度属性
+        ambient.intensity = 0.3;
+        scene.add(ambient); //环境光对象添加到scene场景中
+
+        // 方向光
+        var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        // 设置光源位置
+        directionalLight.position.set(60, 100, 40);
+        scene.add(directionalLight);
+        // 设置用于计算阴影的光源对象
+        directionalLight.castShadow = true;
+        // 设置计算阴影的区域，最好刚好紧密包围在对象周围
+        // 计算阴影的区域过大：模糊  过小：看不到或显示不完整
+        directionalLight.shadow.camera.near = 0.5;
+        directionalLight.shadow.camera.far = 300;
+        directionalLight.shadow.camera.left = -150;
+        directionalLight.shadow.camera.right = 150;
+        directionalLight.shadow.camera.top = 400;
+        directionalLight.shadow.camera.bottom = -300;
+        // 设置mapSize属性可以使阴影更清晰，不那么模糊
+        directionalLight.shadow.mapSize.set(1024,1024);
+        console.log(directionalLight.shadow.camera);
+
+        // 聚光光源
+        var spotLight = new THREE.SpotLight(0xffffff);
+        // 设置聚光光源位置
+        spotLight.position.set(-150, 190, 50);
+        // 设置聚光光源发散角度
+        spotLight.angle = Math.PI / 4
+        scene.add(spotLight); //光对象添加到scene场景中
+        // 设置用于计算阴影的光源对象
+        spotLight.castShadow = true;
+        // 设置计算阴影的区域，注意包裹对象的周围
+        spotLight.shadow.camera.near = 1;
+        spotLight.shadow.camera.far = 500;
+        spotLight.shadow.camera.fov = 20;
+        // 设置mapSize属性可以使阴影更清晰，不那么模糊
+        // spotLight.shadow.mapSize.set(10240,10240);
+        // 聚光灯光源指向网格模型mesh2
+        // spotLight.target = mesh2;
+        // 聚光光源辅助显示
+        var spotLightHelper = new THREE.SpotLightHelper(spotLight);
+        scene.add(spotLightHelper);
+
+        /*
+        * 相机设置
+        */
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        var k = width / height;
+        var s = 400;
+        var camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);
+        camera.position.set(400, 500, 400);
+        camera.lookAt(scene.position);
+
+        /*
+        * 创建渲染器
+        */
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(width, height);
+        renderer.setClearColor(0xf0a1a8, 1);
+        document.body.appendChild(renderer.domElement);
+        // 设置渲染器，允许场景中使用阴影贴图
+        renderer.shadowMap.enabled = true;
+
+        // 渲染函数执行
+        function render() {
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        }
+        render();
+        var controls = new THREE.OrbitControls(camera);
+    </script>
+</body>
+
+</html>
