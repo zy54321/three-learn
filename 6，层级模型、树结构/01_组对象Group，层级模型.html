@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鼠标操作三维场景旋转缩放</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            /* 隐藏body窗口区域滚动条 */
+        }
+    </style>
+    <script src="../JS/three.js"></script>
+    <script src="../JS/three.js-master/examples/js/controls/OrbitControls.js"></script>
+</head>
+
+<body>
+    <script>
+        /*
+        * 创建场景对象
+        */
+        var scene = new THREE.Scene();
+
+        /*
+        * 创建网格模型
+        */
+        // 声明立方体几何对象
+        var geometry = new THREE.BoxGeometry(20, 20, 20);
+        // 点渲染模式
+        var material = new THREE.MeshLambertMaterial({
+            color: 0xa61b29, //颜色
+        });
+
+        // 网格模型mesh沿着x轴方向阵列
+        var group1 = new THREE.Group();
+        var group1 = new THREE.Group();
+        // 共享材质和几何体数据，批量创建mesh
+        for (var i = 0; i < 10; i++) {
+            var mesh = new THREE.Mesh(geometry, material);
+            mesh.translateX(i * 25);
+            scene.add(mesh);
+            // 把网格模型插入到组group中
+            group1.add(mesh);
+        }
+
+        // group1沿着y轴方向阵列
+        var group2 = new THREE.Group();
+        for (var i2 = 0; i2 < 10; i2++) {
+            // 克隆组group1
+            var newGroup2 = group1.clone();
+            // 沿着y轴平移
+            newGroup2.translateY(i2 * 25);
+            scene.add(newGroup2);
+            // group2中插入组group1克隆的对象
+            group2.add(newGroup2);
+        }
+
+        // group2沿着z轴方向阵列
+        for (var i3 = 0; i3 < 10; i3++) {
+            var newGroup3 = group2.clone();
+            newGroup3.translateZ(i3 * 25);
+            scene.add(newGroup3);
+        }
+
+        // 辅助坐标系  
+        var axisHelper = new THREE.AxisHelper(250);
+        scene.add(axisHelper);
+
+        /*
+        * 光源设置
+        */
+        var point = new THREE.PointLight(0xffffff);
+        point.position.set(400, 200, 300);
+        scene.add(point);
+        var ambient = new THREE.AmbientLight(0xe384b8);
+        scene.add(ambient);
+
+        /*
+        * 相机设置
+        */
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        var k = width / height;
+        var s = 400;
+        var camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);
+        camera.position.set(400, 500, 400);
+        camera.lookAt(scene.position);
+
+        /*
+        * 创建渲染器
+        */
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(width, height);
+        renderer.setClearColor(0xf0a1a8, 1);
+        document.body.appendChild(renderer.domElement);
+
+        // 渲染函数执行
+        function render() {
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        }
+        render();
+        var controls = new THREE.OrbitControls(camera);
+    </script>
+</body>
+
+</html>
