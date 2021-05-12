@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>03_多个线条组合曲线CurvePath</title>
+    <title>04_曲线路径管道成型</title>
     <style>
         body {
             margin: 0;
@@ -25,31 +25,58 @@
         var scene = new THREE.Scene();
 
         /*
-        * 创建线条模型
+        * 创建管道网格模型
         */
-        // 声明一个几何体对象Geometry
-        var geometry = new THREE.Geometry();
-        // 绘制一个U型轮廓
-        var R = 80;
-        var arc = new THREE.ArcCurve(0, 0, R, 0, Math.PI, true);
-        // 半圆弧的一个端点作为直线的一个端点
-        var line1 = new THREE.LineCurve(new THREE.Vector2(R, 200, 0), new THREE.Vector2(R, 0, 0));
-        var line2 = new THREE.LineCurve(new THREE.Vector2(-R, 0, 0), new THREE.Vector2(-R, 200, 0));
-        // 创建组合曲线对象CurvePath
-        var CurvePath = new THREE.CurvePath();
-        // 把多个线条插入到CurvePath中
-        CurvePath.curves.push(line1, arc, line2);
-        // 分段数200
-        var points = CurvePath.getPoints(200);
-        // setFromPoints方法从points中提取数据改变几何体的顶点属性vertices
-        geometry.setFromPoints(points);
-        // 材质对象
-        var material = new THREE.LineBasicMaterial({
-            color: 0xf0ff00
+        // 创建管道成型的路径（3D样条曲线）
+        var path = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(-10, -50, -50),
+            new THREE.Vector3(10, 0, 0),
+            new THREE.Vector3(8, 50, 50),
+            new THREE.Vector3(-5, 0, 100)
+        ])
+        // LineCurve3创建直线段路径
+        // var path = new THREE.LineCurve3(new THREE.Vector3(0, 100, 0), new THREE.Vector3(0, 0, 0));
+        // TubeGeometry对2D曲线支持不太好
+        // var path = new THREE.LineCurve(new THREE.Vector2(0, 100), new THREE.Vector2(0, 0));
+        // path: 路径  40：沿着轨迹细分数  12：管道半径  25：管道截面圆细分数
+        var geometry = new THREE.TubeGeometry(path, 40, 12, 25);
+        // 控制台查看TubeBufferGeometry结构
+        // console.log(geometry);
+        // console.log(geometry.index);
+        // 声明材质对象
+        var material = new THREE.MeshPhongMaterial({
+            color: 0xf0ff00,
+            side: THREE.DoubleSide
         });
-        // 线条模型对象
-        var line = new THREE.Line(geometry, material);
-        scene.add(line);
+        // material.wireframe = true;//线条模式渲染(查看细分数)
+        // 管道网格模型对象
+        var mesh = new THREE.Mesh(geometry, material);
+        // 网格模型添加到场景中
+        scene.add(mesh);
+
+        var p1 = new THREE.Vector3(88, 36);
+        var p2 = new THREE.Vector3(50, 20, -30);
+        var p3 = new THREE.Vector3(0, -20, 30);
+        var p4 = new THREE.Vector3(-50, 0, 0);
+        var p5 = new THREE.Vector3(50, -20);
+        // 创建线条一：直线
+        var line1 = new THREE.LineCurve3(p1, p2);
+        // 创建线条二：三维样条曲线
+        var curve = new THREE.CatmullRomCurve3([p2, p3, p4]);
+        // 创建线条三：直线
+        var line2 = new THREE.LineCurve3(p4, p5);
+        // 创建CurvePath对象
+        var curvePath = new THREE.CurvePath();
+        // 插入多段线条
+        curvePath.curves.push(line1, curve, line2);
+        //通过多段曲线路径创建生成管道，CCurvePath：管道路径
+        var geometry2 = new THREE.TubeGeometry(curvePath, 100, 5, 25, false);
+        var material2 = new THREE.MeshPhongMaterial({
+            color: 0xE6A23C,
+            side: THREE.DoubleSide,//双面可见
+        })
+        var mesh2 = new THREE.Mesh(geometry2, material2);
+        scene.add(mesh2);
 
         // 坐标系辅助显示
         var axesHelper = new THREE.AxesHelper(200);
